@@ -76,35 +76,53 @@ public class Main {
 		return true;
 	}
 	
-	public static boolean checkSquare(List<int[]> matrix) {//falta probar
+	public static boolean checkSquare(List<int[]> matrix) {
 		//Retorna true si no existe un numero repetido en el cuadrado
 		boolean[] check = {false,false,false,false,false,false,false,false,false};
 		for(int i = 0; i < matrix.size(); i++)
 			for(int j = 0; j < matrix.get(i).length; j++)
-				check[(matrix.get(i)[j])-1] = true;	
+				if (matrix.get(i)[j] > 0)
+					check[(matrix.get(i)[j])-1] = true;	
+				else 
+					return false;
 		for(int i = 0; i < check.length; i++)
 			if(!check[i])
 				return false;
 		return true;
 	}
 	
-	public static boolean checkRowOrColumn(int[] array) {//falta probar
+	public static boolean checkRowOrColumn(int[] array) {
 		//Retorna true si no existe un numero repetido en la fila o columna
 		boolean[] check = {false,false,false,false,false,false,false,false,false};
 		for(int i=0; i < array.length; i++)
-			check[array[i]-1] = true;
+			if (array[i] > 0)
+				check[array[i]-1] = true;
+			else 
+				return false;
 		for(int i = 0; i < check.length; i++)
 			if(!check[i])
 				return false;
 		return true;
 	}
 	
-	public boolean isSolution(List<int[]> matrix) {
-		
-		return false;
+	public static boolean isSolution(List<int[]> matrix) {
+		//chequeamos todas las columnas
+		for(int i = 0; i < matrix.size(); i++)
+			if(!checkRowOrColumn(getColumn(matrix, i)))
+				return false;
+		//chequeamos todas las filas
+		for(int i = 0; i < matrix.size(); i++)
+			if(!checkRowOrColumn(getRow(matrix, i)))
+				return false;
+		//chequeamos todos los cuadrados
+		for(int i = 0; i < matrix.size(); i++) 
+			for(int j = 0; j < matrix.get(i).length; j++) 
+				if(!checkSquare(getSquare(matrix, i, j)))
+					return false;
+		return true;
 	}
 	
-	public void findSolution(List<int[]> matrix){
+	public static void findSolution(List<int[]> matrix){
 		if (isSolution(matrix)) // Si es solucion, imprimo la solucion
 			for (int[] eachRow : matrix) {
 	              System.out.println(Arrays.toString(eachRow));
@@ -114,12 +132,13 @@ public class Main {
 			for(int i=0; i < matrix.get(0).length; i++) //recorro las filas 
 				for(int j=0; j < matrix.size(); j++) //recorro las columnas
 					if(matrix.get(i)[j] == 0) //Si la posicion es cero, quiere decir que esta vacio.
-						for(int number=1; number <= 9; number++) {
-							
-						}
-							
-							
-				
+						for(int number=1; number <= 9; number++) //Chequeo si el numero que voy a añadir no pertenece ya a la solucion, si no pertenece lo añado
+							if (checkNumberInSquare(getSquare(matrix, i, j),number))
+								if (checkNumberInRowOrColumn(getColumn(matrix,j), number))
+									if (checkNumberInRowOrColumn(getRow(matrix, i),number)) {
+										matrix.get(i)[j] = number;
+										findSolution(matrix);
+									}		
 		}
 	}
 	
@@ -128,21 +147,29 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		List<int[]> matrix = new ArrayList<int[]>();
-		matrix.add(new int[]{0,0,0,0,0,0,0,0,1});
-		matrix.add(new int[]{0,1,0,0,2,0,0,3,0});
-		matrix.add(new int[]{0,0,0,0,0,0,0,0,0});
-		matrix.add(new int[]{0,0,0,0,0,0,0,0,0});
-		matrix.add(new int[]{0,4,0,0,5,0,0,6,0});
-		matrix.add(new int[]{0,0,0,0,0,0,0,0,0});
-		matrix.add(new int[]{0,0,0,0,0,0,0,0,0});
-		matrix.add(new int[]{0,7,0,0,8,0,0,9,0});
-		matrix.add(new int[]{0,0,0,0,0,0,0,0,0});
+		matrix.add(new int[]{ 3, 1, 0, 5, 7, 8, 4, 9, 2 });
+		matrix.add(new int[]{ 5, 2, 9, 1, 3, 4, 7, 0, 8 });
+		matrix.add(new int[]{ 4, 8, 7, 6, 2, 9, 5, 3, 1 });
+		matrix.add(new int[]{ 2, 6, 3, 4, 1, 5, 9, 8, 0 });
+		matrix.add(new int[]{ 9, 0, 4, 8, 6, 3, 0, 2, 5 });
+		matrix.add(new int[]{ 8, 5, 1, 7, 0, 2, 0, 4, 3 });
+		matrix.add(new int[]{ 1, 0, 8, 9, 4, 7, 2, 5, 6 });
+		matrix.add(new int[]{ 6, 9, 0, 3, 5, 1, 8, 0, 4 });
+		matrix.add(new int[]{ 0, 4, 5, 2, 0, 6, 3, 1, 9 });
+		findSolution(matrix);
 		
-		//for(int i=0; i < matrix.get(0).length; i++)
-		//	System.out.println(matrix.get(0)[i]);
-		/*for (int[] eachRow : matrix) {
-              System.out.println(Arrays.toString(eachRow));
-		}*/
+		/*
+		 *Solucion de la matriz
+		matrix.add(new int[]{ 3, 1, 6, 5, 7, 8, 4, 9, 2 });
+		matrix.add(new int[]{ 5, 2, 9, 1, 3, 4, 7, 6, 8 });
+		matrix.add(new int[]{ 4, 8, 7, 6, 2, 9, 5, 3, 1 });
+		matrix.add(new int[]{ 2, 6, 3, 4, 1, 5, 9, 8, 7 });
+		matrix.add(new int[]{ 9, 7, 4, 8, 6, 3, 1, 2, 5 });
+		matrix.add(new int[]{ 8, 5, 1, 7, 9, 2, 6, 4, 3 });
+		matrix.add(new int[]{ 1, 3, 8, 9, 4, 7, 2, 5, 6 });
+		matrix.add(new int[]{ 6, 9, 2, 3, 5, 1, 8, 7, 4 });
+		matrix.add(new int[]{ 7, 4, 5, 2, 8, 6, 3, 1, 9 });
+		*/
 	}
 
 }
